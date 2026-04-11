@@ -34,9 +34,9 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yawlabs/electron-optimize.git"
+    "url": "https://github.com/YawLabs/electron-optimize.git"
   },
-  "homepage": "https://github.com/yawlabs/electron-optimize",
+  "homepage": "https://github.com/YawLabs/electron-optimize",
   "engines": {
     "node": ">=16.0.0"
   },
