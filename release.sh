@@ -155,7 +155,7 @@ else
   else
     npm publish --access public
   fi
-  info "Published electron-optimize@${VERSION} to npm"
+  info "Published @yawlabs/electron-optimize@${VERSION} to npm"
 fi
 
 # =============================================================================
@@ -188,7 +188,7 @@ sleep 3
 
 NPM_VERSION=$(npm view electron-optimize version 2>/dev/null || echo "")
 if [ "$NPM_VERSION" = "$VERSION" ]; then
-  info "npm: electron-optimize@${NPM_VERSION}"
+  info "npm: @yawlabs/electron-optimize@${NPM_VERSION}"
 else
   warn "npm shows ${NPM_VERSION:-nothing} (expected $VERSION — may still be propagating)"
 fi
@@ -212,6 +212,6 @@ fi
 echo ""
 echo -e "${GREEN}  v${VERSION} released successfully!${NC}"
 echo ""
-echo -e "  npm: https://www.npmjs.com/package/electron-optimize"
+echo -e "  npm: https://www.npmjs.com/package/@yawlabs/electron-optimize"
 echo -e "  git: https://github.com/YawLabs/electron-optimize/releases/tag/v${VERSION}"
 echo ""

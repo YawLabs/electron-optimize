@@ -7,7 +7,7 @@ Built by [Yaw Labs](https://yaw.sh), extracted from a shipping Electron app afte
 ## Install
 
 ```bash
-npm install electron-optimize
+npm install @yawlabs/electron-optimize
 ```
 
 ## Modules
@@ -17,7 +17,7 @@ npm install electron-optimize
 Chromium creates `.tmp` files in `Network/` and `Session Storage/` directories that are never cleaned up. Over weeks of use, these accumulate silently. This function removes them on startup.
 
 ```ts
-import { cleanupTempFiles } from 'electron-optimize';
+import { cleanupTempFiles } from '@yawlabs/electron-optimize';
 import { app } from 'electron';
 
 app.whenReady().then(() => {
@@ -37,7 +37,7 @@ After an app update, stale compiled resources in the HTTP cache can cause the re
 **Not called automatically** — you must explicitly call this function. Offline-first apps should either skip this or set `clearCacheStorage: false`.
 
 ```ts
-import { clearCacheOnUpdate } from 'electron-optimize';
+import { clearCacheOnUpdate } from '@yawlabs/electron-optimize';
 import { app, session } from 'electron';
 
 app.whenReady().then(async () => {
@@ -62,7 +62,7 @@ app.whenReady().then(async () => {
 When users save and restore window positions, saved coordinates become invalid if a monitor is disconnected, resolution changes, or DPI settings change. This ensures windows always appear on a visible display.
 
 ```ts
-import { validateWindowBounds } from 'electron-optimize';
+import { validateWindowBounds } from '@yawlabs/electron-optimize';
 import { screen, BrowserWindow } from 'electron';
 
 // Restoring a saved window
@@ -89,7 +89,7 @@ const win = new BrowserWindow({ ...bounds });
 Measures initialization milestones with `process.hrtime.bigint()` for sub-millisecond precision. Zero overhead when marks aren't read.
 
 ```ts
-import { createStartupTimer } from 'electron-optimize';
+import { createStartupTimer } from '@yawlabs/electron-optimize';
 
 const timer = createStartupTimer();
 
@@ -130,7 +130,7 @@ Output:
 When a laptop sleeps and wakes, polling timers that fired during sleep all execute at once, and network requests fail because WiFi hasn't reconnected. This provides a clean pause/resume lifecycle.
 
 ```ts
-import { managePowerState } from 'electron-optimize';
+import { managePowerState } from '@yawlabs/electron-optimize';
 import { powerMonitor, app } from 'electron';
 
 let pollingTimer: ReturnType<typeof setInterval> | null = null;
@@ -162,7 +162,7 @@ app.on('before-quit', cleanup);
 Lists all Chromium/Electron child processes with CPU and memory usage. Useful for development profiling.
 
 ```ts
-import { auditProcesses } from 'electron-optimize';
+import { auditProcesses } from '@yawlabs/electron-optimize';
 import { app } from 'electron';
 
 // Wait for processes to stabilize, then audit

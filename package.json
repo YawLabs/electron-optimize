@@ -1,5 +1,5 @@
 {
-  "name": "electron-optimize",
+  "name": "@yawlabs/electron-optimize",
   "version": "1.0.1",
   "description": "Drop-in optimization utilities for Electron apps — temp file cleanup, window bounds validation, startup timing, cache management, and power state handling.",
   "main": "dist/index.js",
