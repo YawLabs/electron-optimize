@@ -82,4 +82,12 @@ describe('validateWindowBounds', () => {
     // Should not use saved position — center instead
     expect(bounds.x).toBe(Math.round((1920 - bounds.width) / 2));
   });
+
+  it('clamps window to display size when display is smaller than minWidth', () => {
+    const tinyDisplay = { x: 0, y: 0, width: 300, height: 200 };
+    const bounds = validateWindowBounds(null, tinyDisplay);
+    // Should not exceed display dimensions even though minWidth=400
+    expect(bounds.width).toBeLessThanOrEqual(300);
+    expect(bounds.height).toBeLessThanOrEqual(200);
+  });
 });

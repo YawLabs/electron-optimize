@@ -1,9 +1,16 @@
 {
   "name": "electron-optimize",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Drop-in optimization utilities for Electron apps — temp file cleanup, window bounds validation, startup timing, cache management, and power state handling.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "sideEffects": false,
   "files": [
     "dist"
   ],
@@ -30,6 +37,9 @@
     "url": "https://github.com/yawlabs/electron-optimize.git"
   },
   "homepage": "https://github.com/yawlabs/electron-optimize",
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "peerDependencies": {
     "electron": ">=20.0.0"
   },

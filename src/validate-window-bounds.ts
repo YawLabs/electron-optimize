@@ -100,13 +100,13 @@ export function validateWindowBounds(
   if (savedOnScreen && savedBounds!.width <= dw) {
     width = Math.max(savedBounds!.width, minW);
   } else {
-    width = Math.max(Math.round(dw * defaultWidthFrac), minW);
+    width = Math.min(Math.max(Math.round(dw * defaultWidthFrac), minW), dw);
   }
 
   if (savedOnScreen && savedBounds!.height <= dh) {
     height = Math.max(savedBounds!.height, minH);
   } else {
-    height = Math.max(Math.round(dh * defaultHeightFrac), minH);
+    height = Math.min(Math.max(Math.round(dh * defaultHeightFrac), minH), dh);
   }
 
   // Use saved position only if on-screen; otherwise center

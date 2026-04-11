@@ -73,7 +73,7 @@ function formatBytes(bytes: number): string {
  *   setTimeout(() => {
  *     const audit = auditProcesses(app);
  *     console.log(`Total: ${audit.totalMemoryFormatted} across ${audit.processes.length} processes`);
- *     console.log(`GPU: ${formatBytes(audit.gpuMemory)}`);
+ *     console.log(`GPU: ${audit.processes.find(p => p.isGpu)?.memoryFormatted ?? 'N/A'}`);
  *     console.log(`Renderers: ${audit.rendererCount}`);
  *     for (const p of audit.processes) {
  *       console.log(`  ${p.type} (pid ${p.pid}): ${p.memoryFormatted}`);
