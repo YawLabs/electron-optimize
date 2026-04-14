@@ -192,7 +192,9 @@ These are deliberate scope boundaries, not missing features.
 ## Requirements
 
 - Electron >= 20.0.0
-- Node.js >= 16
+- Node.js >= 20
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md#supported-node--electron-versions) for the versioning policy.
 
 ## License
 

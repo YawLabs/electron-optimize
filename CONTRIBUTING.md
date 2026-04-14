@@ -66,6 +66,20 @@ Open an issue on GitHub. Include:
 - Steps to reproduce
 - Environment details (OS, Node version, etc.)
 
+## Supported Node & Electron versions
+
+This is an Electron utility library, so we anchor our supported versions to Electron's support matrix rather than Node's LTS calendar. The rule:
+
+- **`engines.node`** ≥ minimum Node version bundled by any Electron major currently in Electron's stable support window.
+- **`peerDependencies.electron`** ≥ oldest Electron major we actively test against.
+- **CI matrix** tests those Node versions, no older.
+
+When Electron drops an old major from their support matrix, we drop its Node version from ours. When a Node version hits EOL and no supported Electron still bundles it, we drop it.
+
+Bumping `engines.node` is a minor release (per industry norm — EOL Node removal is expected cadence). Bumping `peerDependencies.electron` is a major release.
+
+Check quarterly: https://www.electronjs.org/docs/latest/tutorial/electron-timelines
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the same license as this project.
