@@ -1,4 +1,4 @@
-import type { ElectronPowerMonitor } from './electron-types';
+import type { ElectronPowerMonitor } from "./electron-types";
 
 /**
  * Callbacks invoked on power state changes.
@@ -88,12 +88,12 @@ export function managePowerState(
     }
   };
 
-  powerMonitor.on('suspend', onSuspend);
-  powerMonitor.on('resume', onResume);
+  powerMonitor.on("suspend", onSuspend);
+  powerMonitor.on("resume", onResume);
 
   return () => {
-    powerMonitor.removeListener('suspend', onSuspend);
-    powerMonitor.removeListener('resume', onResume);
+    powerMonitor.removeListener("suspend", onSuspend);
+    powerMonitor.removeListener("resume", onResume);
     if (resumeTimeout) {
       clearTimeout(resumeTimeout);
       resumeTimeout = null;

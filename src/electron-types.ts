@@ -10,8 +10,8 @@ export interface ElectronSession {
 }
 
 export interface ElectronPowerMonitor {
-  on(event: 'suspend' | 'resume', listener: () => void): void;
-  removeListener(event: 'suspend' | 'resume', listener: () => void): void;
+  on(event: "suspend" | "resume", listener: () => void): void;
+  removeListener(event: "suspend" | "resume", listener: () => void): void;
 }
 
 export interface AppMetricsCpu {

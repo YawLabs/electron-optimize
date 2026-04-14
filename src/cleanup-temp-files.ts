@@ -1,5 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
+import fs from "node:fs";
+import path from "node:path";
 
 /**
  * Directories inside Electron's userData where Chromium accumulates
@@ -11,7 +11,7 @@ import path from 'node:path';
  * These grow unbounded over time and are safe to remove on startup
  * (before Chromium opens them).
  */
-const DEFAULT_SUBDIRS = ['Network', 'Session Storage'];
+const DEFAULT_SUBDIRS = ["Network", "Session Storage"];
 
 export interface CleanupTempFilesOptions {
   /**
@@ -51,12 +51,9 @@ export interface CleanupTempFilesOptions {
  * });
  * ```
  */
-export function cleanupTempFiles(
-  userData: string,
-  options?: CleanupTempFilesOptions,
-): number {
+export function cleanupTempFiles(userData: string, options?: CleanupTempFilesOptions): number {
   const subdirs = options?.subdirs ?? DEFAULT_SUBDIRS;
-  const extensions = (options?.extensions ?? ['.tmp']).map((e) => e.toLowerCase());
+  const extensions = (options?.extensions ?? [".tmp"]).map((e) => e.toLowerCase());
   let removed = 0;
 
   for (const sub of subdirs) {

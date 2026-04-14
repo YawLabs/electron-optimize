@@ -1,4 +1,4 @@
-import type { ElectronApp } from './electron-types';
+import type { ElectronApp } from "./electron-types";
 
 /**
  * Information about a single Chromium/Electron process.
@@ -93,8 +93,8 @@ export function auditProcesses(app: ElectronApp): AuditResult {
       cpu: m.cpu.percentCPUUsage,
       memory: mem,
       memoryFormatted: formatBytes(mem),
-      isGpu: m.type === 'GPU',
-      isRenderer: m.type === 'Tab' || m.type === 'Renderer',
+      isGpu: m.type === "GPU",
+      isRenderer: m.type === "Tab" || m.type === "Renderer",
     };
   });
 

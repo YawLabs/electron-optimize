@@ -89,9 +89,12 @@ export function validateWindowBounds(
   const { x: dx, y: dy, width: dw, height: dh } = workArea;
 
   // Check if the saved position is actually on this display
-  const savedOnScreen = savedBounds != null
-    && savedBounds.x >= dx && savedBounds.x < dx + dw
-    && savedBounds.y >= dy && savedBounds.y < dy + dh;
+  const savedOnScreen =
+    savedBounds != null &&
+    savedBounds.x >= dx &&
+    savedBounds.x < dx + dw &&
+    savedBounds.y >= dy &&
+    savedBounds.y < dy + dh;
 
   // Use saved size only if the window was on this display and fits
   let width: number;

@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { managePowerState } from '../src/manage-power-state';
-import type { ElectronPowerMonitor } from '../src/electron-types';
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { ElectronPowerMonitor } from "../src/electron-types";
+import { managePowerState } from "../src/manage-power-state";
 
 function mockPowerMonitor() {
   const listeners = new Map<string, Set<() => void>>();
@@ -21,7 +21,7 @@ function mockPowerMonitor() {
   } as ElectronPowerMonitor & { emit: (e: string) => void; listenerCount: (e: string) => number };
 }
 
-describe('managePowerState', () => {
+describe("managePowerState", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });
@@ -30,36 +30,36 @@ describe('managePowerState', () => {
     vi.useRealTimers();
   });
 
-  it('calls onSuspend when system suspends', () => {
+  it("calls onSuspend when system suspends", () => {
     const pm = mockPowerMonitor();
     const onSuspend = vi.fn();
     const onResume = vi.fn();
 
     managePowerState(pm, { onSuspend, onResume });
-    pm.emit('suspend');
+    pm.emit("suspend");
 
     expect(onSuspend).toHaveBeenCalledOnce();
     expect(onResume).not.toHaveBeenCalled();
   });
 
-  it('delays onResume by default (5 seconds)', () => {
+  it("delays onResume by default (5 seconds)", () => {
     const pm = mockPowerMonitor();
     const onResume = vi.fn();
 
     managePowerState(pm, { onSuspend: vi.fn(), onResume });
-    pm.emit('resume');
+    pm.emit("resume");
 
     expect(onResume).not.toHaveBeenCalled();
     vi.advanceTimersByTime(5000);
     expect(onResume).toHaveBeenCalledOnce();
   });
 
-  it('respects custom resumeDelayMs', () => {
+  it("respects custom resumeDelayMs", () => {
     const pm = mockPowerMonitor();
     const onResume = vi.fn();
 
     managePowerState(pm, { onSuspend: vi.fn(), onResume }, { resumeDelayMs: 1000 });
-    pm.emit('resume');
+    pm.emit("resume");
 
     vi.advanceTimersByTime(999);
     expect(onResume).not.toHaveBeenCalled();
@@ -67,17 +67,17 @@ describe('managePowerState', () => {
     expect(onResume).toHaveBeenCalledOnce();
   });
 
-  it('calls onResume immediately when delay is 0', () => {
+  it("calls onResume immediately when delay is 0", () => {
     const pm = mockPowerMonitor();
     const onResume = vi.fn();
 
     managePowerState(pm, { onSuspend: vi.fn(), onResume }, { resumeDelayMs: 0 });
-    pm.emit('resume');
+    pm.emit("resume");
 
     expect(onResume).toHaveBeenCalledOnce();
   });
 
-  it('cancels pending resume on rapid suspend/resume cycle', () => {
+  it("cancels pending resume on rapid suspend/resume cycle", () => {
     const pm = mockPowerMonitor();
     const onSuspend = vi.fn();
     const onResume = vi.fn();
@@ -85,9 +85,9 @@ describe('managePowerState', () => {
     managePowerState(pm, { onSuspend, onResume });
 
     // Resume, then immediately suspend again before delay fires
-    pm.emit('resume');
+    pm.emit("resume");
     vi.advanceTimersByTime(2000); // Partially through the 5s delay
-    pm.emit('suspend');
+    pm.emit("suspend");
 
     // The pending resume should be cancelled
     vi.advanceTimersByTime(10000);
@@ -95,25 +95,25 @@ describe('managePowerState', () => {
     expect(onSuspend).toHaveBeenCalledTimes(1);
   });
 
-  it('cleanup removes all listeners', () => {
+  it("cleanup removes all listeners", () => {
     const pm = mockPowerMonitor();
     const cleanup = managePowerState(pm, { onSuspend: vi.fn(), onResume: vi.fn() });
 
-    expect(pm.listenerCount('suspend')).toBe(1);
-    expect(pm.listenerCount('resume')).toBe(1);
+    expect(pm.listenerCount("suspend")).toBe(1);
+    expect(pm.listenerCount("resume")).toBe(1);
 
     cleanup();
 
-    expect(pm.listenerCount('suspend')).toBe(0);
-    expect(pm.listenerCount('resume')).toBe(0);
+    expect(pm.listenerCount("suspend")).toBe(0);
+    expect(pm.listenerCount("resume")).toBe(0);
   });
 
-  it('cleanup cancels pending resume timeout', () => {
+  it("cleanup cancels pending resume timeout", () => {
     const pm = mockPowerMonitor();
     const onResume = vi.fn();
     const cleanup = managePowerState(pm, { onSuspend: vi.fn(), onResume });
 
-    pm.emit('resume');
+    pm.emit("resume");
     cleanup();
     vi.advanceTimersByTime(10000);
 

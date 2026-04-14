@@ -51,7 +51,7 @@ export interface StartupMark {
  * //     487.1ms  ready-to-show
  * ```
  */
-export function createStartupTimer(label = 'startup') {
+export function createStartupTimer(label = "startup") {
   const t0 = process.hrtime.bigint();
   const marks: [string, bigint][] = [];
 
@@ -73,7 +73,7 @@ export function createStartupTimer(label = 'startup') {
         const ms = Number(ts - t0) / 1e6;
         return `  ${ms.toFixed(1).padStart(8)}ms  ${name}`;
       });
-      console.log(`[${label}]\n${lines.join('\n')}`);
+      console.log(`[${label}]\n${lines.join("\n")}`);
       marks.length = 0;
     },
 

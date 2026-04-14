@@ -1,6 +1,6 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import type { ElectronSession } from './electron-types';
+import fs from "node:fs";
+import path from "node:path";
+import type { ElectronSession } from "./electron-types";
 
 export interface ClearCacheOnUpdateOptions {
   /**
@@ -76,14 +76,14 @@ export async function clearCacheOnUpdate(
   session: ElectronSession,
   options?: ClearCacheOnUpdateOptions,
 ): Promise<ClearCacheOnUpdateResult> {
-  const filename = options?.versionFilename ?? '.last-version';
+  const filename = options?.versionFilename ?? ".last-version";
   const clearCacheStorage = options?.clearCacheStorage ?? true;
   const clearHttpCache = options?.clearHttpCache ?? true;
   const versionFile = path.join(userData, filename);
 
   let previousVersion: string | null = null;
   try {
-    previousVersion = fs.readFileSync(versionFile, 'utf-8').trim();
+    previousVersion = fs.readFileSync(versionFile, "utf-8").trim();
   } catch {
     // First run — no version file yet
   }
@@ -94,9 +94,7 @@ export async function clearCacheOnUpdate(
     const promises: Promise<void>[] = [];
 
     if (clearCacheStorage) {
-      promises.push(
-        session.clearStorageData({ storages: ['cachestorage'] }).catch(() => {}),
-      );
+      promises.push(session.clearStorageData({ storages: ["cachestorage"] }).catch(() => {}));
     }
 
     if (clearHttpCache) {

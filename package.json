@@ -1,6 +1,6 @@
 {
   "name": "@yawlabs/electron-optimize",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Drop-in optimization utilities for Electron apps — temp file cleanup, window bounds validation, startup timing, cache management, and power state handling.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -18,6 +18,9 @@
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
+    "lint": "biome check src/ test/",
+    "lint:fix": "biome check --write src/ test/",
+    "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -36,14 +39,18 @@
     "type": "git",
     "url": "https://github.com/YawLabs/electron-optimize.git"
   },
+  "bugs": {
+    "url": "https://github.com/YawLabs/electron-optimize/issues"
+  },
   "homepage": "https://github.com/YawLabs/electron-optimize",
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=18.0.0"
   },
   "peerDependencies": {
     "electron": ">=20.0.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.4.11",
     "typescript": "^5.7.0",
     "vitest": "^3.1.0"
   }
