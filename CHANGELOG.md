@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-05-16
+
+### Fixed
+
+- `managePowerState`: back-to-back `resume` events (no intervening
+  `suspend`) no longer stack timeouts and double-invoke `onResume`. The
+  pending resume timeout is now cleared before scheduling a new one.
+- `clearCacheOnUpdate`: a transient failure in `clearCache` or
+  `clearStorageData` no longer writes the new version to disk. The old
+  version is preserved so the next launch retries the clears, instead of
+  silently skipping them forever.
+- JSDoc `@example` blocks across all modules now import from the correct
+  `@yawlabs/electron-optimize` scope (previously the unscoped name).
+  Visible in editor hover info from the published `.d.ts` files.
+- `validateWindowBounds` JSDoc now notes that `minWidth` / `minHeight` are
+  capped at the display size (the behavior was already correct and tested,
+  the doc was misleading).
+
 ## [1.1.0] - 2026-04-13
 
 ### Changed
@@ -62,6 +80,7 @@ No functional changes. Tooling and metadata only.
 - `auditProcesses` — per-process CPU and memory breakdown for Electron's
   child processes.
 
+[1.1.1]: https://github.com/YawLabs/electron-optimize/releases/tag/v1.1.1
 [1.1.0]: https://github.com/YawLabs/electron-optimize/releases/tag/v1.1.0
 [1.0.2]: https://github.com/YawLabs/electron-optimize/releases/tag/v1.0.2
 [1.0.1]: https://github.com/YawLabs/electron-optimize/releases/tag/v1.0.1
