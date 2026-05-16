@@ -46,6 +46,30 @@ describe("createStartupTimer", () => {
     spy.mockRestore();
   });
 
+  it("flush output preserves the documented padded format", () => {
+    // Pin hrtime so the formatted ms value is deterministic.
+    let counter = 0n;
+    const hrtimeSpy = vi.spyOn(process.hrtime, "bigint").mockImplementation(() => {
+      const v = counter;
+      counter += 1_500_000n; // +1.5 ms per call
+      return v;
+    });
+    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const timer = createStartupTimer();
+    timer.mark("first");
+    timer.flush();
+
+    // Expected line layout per the implementation:
+    //   "  " + padStart(8) of ms.toFixed(1) + "ms  " + label
+    // ms = (1_500_000 - 0) / 1e6 = 1.5 -> "1.5" -> "     1.5" (padded)
+    // Full line: "       1.5ms  first" (2 + 8 + 2 + 2 + 5 = 19 chars)
+    expect(consoleSpy.mock.calls[0][0]).toBe("[startup]\n       1.5ms  first");
+
+    consoleSpy.mockRestore();
+    hrtimeSpy.mockRestore();
+  });
+
   it("reset clears marks without printing", () => {
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
     const timer = createStartupTimer();
