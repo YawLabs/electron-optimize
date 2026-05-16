@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { cleanupTempFiles } from "../src/cleanup-temp-files";
 
 describe("cleanupTempFiles", () => {
@@ -58,6 +58,27 @@ describe("cleanupTempFiles", () => {
 
     const removed = cleanupTempFiles(tmpDir);
     expect(removed).toBe(0);
+  });
+
+  it("counts only successfully removed files when some unlinks fail", () => {
+    const dir = path.join(tmpDir, "Network");
+    fs.mkdirSync(dir);
+    fs.writeFileSync(path.join(dir, "a.tmp"), "");
+    fs.writeFileSync(path.join(dir, "b.tmp"), "");
+    fs.writeFileSync(path.join(dir, "c.tmp"), "");
+
+    // Simulate a locked file (common on Windows when Chromium still holds it):
+    // one unlink rejects, the others succeed.
+    const spy = vi.spyOn(fs, "unlinkSync").mockImplementation((p) => {
+      if (String(p).endsWith("b.tmp")) {
+        throw Object.assign(new Error("EBUSY: resource busy or locked"), { code: "EBUSY" });
+      }
+    });
+
+    const removed = cleanupTempFiles(tmpDir);
+
+    expect(removed).toBe(2);
+    spy.mockRestore();
   });
 
   it("accepts custom subdirs and extensions", () => {

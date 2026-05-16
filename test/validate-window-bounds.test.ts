@@ -83,6 +83,45 @@ describe("validateWindowBounds", () => {
     expect(bounds.x).toBe(Math.round((1920 - bounds.width) / 2));
   });
 
+  it("falls back to fraction size when saved width exceeds display", () => {
+    // Saved on this display but wider than it (e.g. restored from a 4K monitor)
+    const saved = { x: 100, y: 100, width: 2400, height: 600 };
+    const bounds = validateWindowBounds(saved, DISPLAY);
+    // Width should drop back to the fraction default
+    expect(bounds.width).toBe(Math.round(1920 * 0.8));
+    // Height was reasonable, kept as saved
+    expect(bounds.height).toBe(600);
+    // Saved x is still in range after the new width: max(0, min(100, 1920-1536)) = 100
+    expect(bounds.x).toBe(100);
+    expect(bounds.y).toBe(100);
+  });
+
+  it("falls back to fraction size when saved height exceeds display", () => {
+    const saved = { x: 100, y: 100, width: 800, height: 1500 };
+    const bounds = validateWindowBounds(saved, DISPLAY);
+    expect(bounds.width).toBe(800);
+    expect(bounds.height).toBe(Math.round(1080 * 0.8));
+    expect(bounds.y).toBe(100);
+  });
+
+  it("treats undefined saved bounds the same as null", () => {
+    const bounds = validateWindowBounds(undefined, DISPLAY);
+    expect(bounds.width).toBe(Math.round(1920 * 0.8));
+    expect(bounds.height).toBe(Math.round(1080 * 0.8));
+    expect(bounds.x).toBe(Math.round((1920 - bounds.width) / 2));
+    expect(bounds.y).toBe(Math.round((1080 - bounds.height) / 2));
+  });
+
+  it("respects custom minWidth and minHeight", () => {
+    const saved = { x: 100, y: 100, width: 500, height: 400 };
+    const bounds = validateWindowBounds(saved, DISPLAY, {
+      minWidth: 800,
+      minHeight: 600,
+    });
+    expect(bounds.width).toBe(800);
+    expect(bounds.height).toBe(600);
+  });
+
   it("clamps window to display size when display is smaller than minWidth", () => {
     const tinyDisplay = { x: 0, y: 0, width: 300, height: 200 };
     const bounds = validateWindowBounds(null, tinyDisplay);

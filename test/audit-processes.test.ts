@@ -80,6 +80,34 @@ describe("auditProcesses", () => {
     expect(result.totalMemoryFormatted).toContain("MB");
   });
 
+  it("formats zero memory as bytes", () => {
+    const app = mockApp([{ type: "Browser", pid: 100, cpu: 0, memoryKB: 0 }]);
+    const result = auditProcesses(app);
+    expect(result.processes[0].memoryFormatted).toBe("0 B");
+    expect(result.totalMemoryFormatted).toBe("0 B");
+  });
+
+  it("formats the smallest nonzero memory at the 1024-byte boundary as KB", () => {
+    // workingSetSize is in KB, so the smallest nonzero value is 1 KB = 1024 bytes
+    const app = mockApp([{ type: "Browser", pid: 100, cpu: 0, memoryKB: 1 }]);
+    const result = auditProcesses(app);
+    expect(result.processes[0].memoryFormatted).toBe("1.0 KB");
+  });
+
+  it("formats memory in the KB tier without crossing into MB", () => {
+    // 500 KB stays in KB (under 1024 KB = 1 MB)
+    const app = mockApp([{ type: "Browser", pid: 100, cpu: 0, memoryKB: 500 }]);
+    const result = auditProcesses(app);
+    expect(result.processes[0].memoryFormatted).toBe("500.0 KB");
+  });
+
+  it("formats the 1 MB boundary as MB", () => {
+    // 1024 KB = 1 MB exactly
+    const app = mockApp([{ type: "Browser", pid: 100, cpu: 0, memoryKB: 1024 }]);
+    const result = auditProcesses(app);
+    expect(result.processes[0].memoryFormatted).toBe("1.0 MB");
+  });
+
   it("handles empty metrics (no processes)", () => {
     const app = mockApp([]);
     const result = auditProcesses(app);
