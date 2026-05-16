@@ -95,6 +95,23 @@ describe("managePowerState", () => {
     expect(onSuspend).toHaveBeenCalledTimes(1);
   });
 
+  it("collapses back-to-back resume events into a single onResume", () => {
+    const pm = mockPowerMonitor();
+    const onResume = vi.fn();
+
+    managePowerState(pm, { onSuspend: vi.fn(), onResume });
+
+    pm.emit("resume");
+    vi.advanceTimersByTime(2000);
+    // A second resume arrives before the first delay elapses (e.g. OS
+    // re-fires the event after a brief disconnect). The pending timeout
+    // should be replaced, not stacked.
+    pm.emit("resume");
+    vi.advanceTimersByTime(5000);
+
+    expect(onResume).toHaveBeenCalledTimes(1);
+  });
+
   it("cleanup removes all listeners", () => {
     const pm = mockPowerMonitor();
     const cleanup = managePowerState(pm, { onSuspend: vi.fn(), onResume: vi.fn() });

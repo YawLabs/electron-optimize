@@ -78,6 +78,11 @@ export function managePowerState(
   };
 
   const onResume = () => {
+    // Cancel any pending resume callback from a previous resume event
+    if (resumeTimeout) {
+      clearTimeout(resumeTimeout);
+      resumeTimeout = null;
+    }
     if (resumeDelay > 0) {
       resumeTimeout = setTimeout(() => {
         resumeTimeout = null;

@@ -9,7 +9,7 @@
 # If interrupted, re-run with the same version — each step is idempotent.
 #
 # Prerequisites:
-#   - Node.js 18+ and npm installed
+#   - Node.js 20+ and npm installed
 #   - npm authenticated (npm whoami) or NODE_AUTH_TOKEN set
 #   - gh CLI authenticated (or GITHUB_TOKEN set)
 # =============================================================================
@@ -132,11 +132,11 @@ else
   if git tag -l "v${VERSION}" | grep -q "v${VERSION}"; then
     info "Tag v${VERSION} already exists"
   else
-    git tag "v${VERSION}"
+    git tag -a "v${VERSION}" -m "v${VERSION}"
     info "Tag v${VERSION} created"
   fi
 
-  git push origin main --tags
+  git push origin main --follow-tags
   info "Pushed to origin"
 fi
 

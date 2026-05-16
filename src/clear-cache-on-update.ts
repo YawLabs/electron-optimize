@@ -91,22 +91,37 @@ export async function clearCacheOnUpdate(
   const versionChanged = previousVersion !== currentVersion;
 
   if (versionChanged) {
-    const promises: Promise<void>[] = [];
+    const attempts: Promise<boolean>[] = [];
 
     if (clearCacheStorage) {
-      promises.push(session.clearStorageData({ storages: ["cachestorage"] }).catch(() => {}));
+      attempts.push(
+        session
+          .clearStorageData({ storages: ["cachestorage"] })
+          .then(() => true)
+          .catch(() => false),
+      );
     }
 
     if (clearHttpCache) {
-      promises.push(session.clearCache().catch(() => {}));
+      attempts.push(
+        session
+          .clearCache()
+          .then(() => true)
+          .catch(() => false),
+      );
     }
 
-    await Promise.all(promises);
+    const results = await Promise.all(attempts);
+    // Only record the new version if every attempted clear succeeded; otherwise
+    // leave the old version on disk so the next launch retries the clears.
+    const allSucceeded = results.every(Boolean);
 
-    try {
-      fs.writeFileSync(versionFile, currentVersion);
-    } catch {
-      // Best effort — non-critical
+    if (allSucceeded) {
+      try {
+        fs.writeFileSync(versionFile, currentVersion);
+      } catch {
+        // Best effort — non-critical
+      }
     }
   }
 

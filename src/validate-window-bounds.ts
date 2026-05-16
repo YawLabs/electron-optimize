@@ -48,7 +48,9 @@ export interface ValidateWindowBoundsOptions {
  * 1. Checks if the saved position falls within the target display
  * 2. If on-screen: clamps to display edges (prevents partial off-screen)
  * 3. If off-screen: centers at 80% of display size (or custom fraction)
- * 4. Enforces minimum dimensions
+ * 4. Enforces minimum dimensions, capped at the display size (a display
+ *    smaller than `minWidth`/`minHeight` will yield a window sized to the
+ *    display rather than overflowing it)
  *
  * Use with Electron's `screen.getDisplayNearestPoint()` to find the
  * right display for saved or cursor coordinates.

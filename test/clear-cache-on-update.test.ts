@@ -86,6 +86,46 @@ describe("clearCacheOnUpdate", () => {
     expect(session.calls).not.toContain("clearCache");
   });
 
+  it("does not record new version when a clear rejects (retries on next launch)", async () => {
+    fs.writeFileSync(path.join(tmpDir, ".last-version"), "1.0.0");
+    const failingSession: ElectronSession = {
+      clearStorageData: () => Promise.reject(new Error("storage failed")),
+      clearCache: () => Promise.resolve(),
+    };
+
+    const result = await clearCacheOnUpdate(tmpDir, "2.0.0", failingSession);
+
+    expect(result.versionChanged).toBe(true);
+    // Version file must still contain the old version so the next launch
+    // re-attempts the clear.
+    const written = fs.readFileSync(path.join(tmpDir, ".last-version"), "utf-8");
+    expect(written).toBe("1.0.0");
+  });
+
+  it("records new version when all attempted clears succeed", async () => {
+    fs.writeFileSync(path.join(tmpDir, ".last-version"), "1.0.0");
+    const session = mockSession();
+
+    await clearCacheOnUpdate(tmpDir, "2.0.0", session);
+
+    const written = fs.readFileSync(path.join(tmpDir, ".last-version"), "utf-8");
+    expect(written).toBe("2.0.0");
+  });
+
+  it("records new version when both clears are disabled (version tracking only)", async () => {
+    fs.writeFileSync(path.join(tmpDir, ".last-version"), "1.0.0");
+    const session = mockSession();
+
+    await clearCacheOnUpdate(tmpDir, "2.0.0", session, {
+      clearCacheStorage: false,
+      clearHttpCache: false,
+    });
+
+    expect(session.calls).toHaveLength(0);
+    const written = fs.readFileSync(path.join(tmpDir, ".last-version"), "utf-8");
+    expect(written).toBe("2.0.0");
+  });
+
   it("uses custom version filename", async () => {
     const session = mockSession();
     await clearCacheOnUpdate(tmpDir, "1.0.0", session, {
