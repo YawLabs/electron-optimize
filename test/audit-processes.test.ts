@@ -108,6 +108,25 @@ describe("auditProcesses", () => {
     expect(result.processes[0].memoryFormatted).toBe("1.0 MB");
   });
 
+  it("formats the 1 GB boundary as GB", () => {
+    // 1024 * 1024 KB = 1 GB exactly
+    const app = mockApp([{ type: "Browser", pid: 100, cpu: 0, memoryKB: 1024 * 1024 }]);
+    const result = auditProcesses(app);
+    expect(result.processes[0].memoryFormatted).toBe("1.0 GB");
+  });
+
+  it("formats memory above 1 GB without falling back to MB", () => {
+    // ~4 GB across renderers — a realistic load for a media-heavy Electron app
+    const app = mockApp([
+      { type: "Browser", pid: 100, cpu: 0, memoryKB: 1024 * 1024 },
+      { type: "Renderer", pid: 200, cpu: 0, memoryKB: 1024 * 1024 },
+      { type: "Renderer", pid: 300, cpu: 0, memoryKB: 1024 * 1024 },
+      { type: "Renderer", pid: 400, cpu: 0, memoryKB: 1024 * 1024 },
+    ]);
+    const result = auditProcesses(app);
+    expect(result.totalMemoryFormatted).toBe("4.0 GB");
+  });
+
   it("handles empty metrics (no processes)", () => {
     const app = mockApp([]);
     const result = auditProcesses(app);
