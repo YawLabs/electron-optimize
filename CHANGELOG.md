@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `auditProcesses`: `memoryFormatted` and `totalMemoryFormatted` now render
+  values >= 1 GB in the GB tier (e.g. `4.0 GB`) instead of overflowing the
+  MB tier (`4096.0 MB`). The numeric `memory` / `totalMemory` fields are
+  unchanged. If you parse the formatted strings, expect the unit suffix to
+  switch at the 1 GB boundary.
+
 ## [1.1.1] - 2026-05-16
 
 ### Fixed
@@ -80,6 +90,7 @@ No functional changes. Tooling and metadata only.
 - `auditProcesses` — per-process CPU and memory breakdown for Electron's
   child processes.
 
+[Unreleased]: https://github.com/YawLabs/electron-optimize/compare/v1.1.1...HEAD
 [1.1.1]: https://github.com/YawLabs/electron-optimize/releases/tag/v1.1.1
 [1.1.0]: https://github.com/YawLabs/electron-optimize/releases/tag/v1.1.0
 [1.0.2]: https://github.com/YawLabs/electron-optimize/releases/tag/v1.0.2
