@@ -55,7 +55,7 @@ export interface ClearCacheOnUpdateResult {
  *
  * @example
  * ```ts
- * import { clearCacheOnUpdate } from 'electron-optimize';
+ * import { clearCacheOnUpdate } from '@yawlabs/electron-optimize';
  * import { app, session } from 'electron';
  *
  * app.whenReady().then(async () => {

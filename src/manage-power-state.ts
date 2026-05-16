@@ -43,7 +43,7 @@ export interface ManagePowerStateOptions {
  *
  * @example
  * ```ts
- * import { managePowerState } from 'electron-optimize';
+ * import { managePowerState } from '@yawlabs/electron-optimize';
  * import { powerMonitor } from 'electron';
  *
  * const cleanup = managePowerState(powerMonitor, {

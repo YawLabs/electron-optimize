@@ -22,7 +22,7 @@ export interface StartupMark {
  *
  * @example
  * ```ts
- * import { createStartupTimer } from 'electron-optimize';
+ * import { createStartupTimer } from '@yawlabs/electron-optimize';
  *
  * const timer = createStartupTimer();
  *

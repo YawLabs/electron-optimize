@@ -42,7 +42,7 @@ export interface CleanupTempFilesOptions {
  *
  * @example
  * ```ts
- * import { cleanupTempFiles } from 'electron-optimize';
+ * import { cleanupTempFiles } from '@yawlabs/electron-optimize';
  * import { app } from 'electron';
  *
  * app.whenReady().then(() => {

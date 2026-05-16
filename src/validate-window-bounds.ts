@@ -60,7 +60,7 @@ export interface ValidateWindowBoundsOptions {
  *
  * @example
  * ```ts
- * import { validateWindowBounds } from 'electron-optimize';
+ * import { validateWindowBounds } from '@yawlabs/electron-optimize';
  * import { screen } from 'electron';
  *
  * // Restoring a saved window

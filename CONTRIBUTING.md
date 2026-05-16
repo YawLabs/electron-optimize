@@ -36,7 +36,6 @@ npm test
 |---------|-------------|
 | `npm install` | Install dependencies |
 | `npm run build` | Compile TypeScript |
-| `npm run dev` | Run in development mode |
 | `npm test` | Run the test suite |
 | `npm run lint` | Check for lint errors |
 | `npm run lint:fix` | Auto-fix lint and formatting |

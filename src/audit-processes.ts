@@ -65,7 +65,7 @@ function formatBytes(bytes: number): string {
  *
  * @example
  * ```ts
- * import { auditProcesses } from 'electron-optimize';
+ * import { auditProcesses } from '@yawlabs/electron-optimize';
  * import { app } from 'electron';
  *
  * // Log process breakdown on startup
