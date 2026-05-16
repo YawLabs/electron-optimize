@@ -163,19 +163,46 @@ fi
 # =============================================================================
 step 5 "Create GitHub release"
 
+# Extract the [X.Y.Z] section from CHANGELOG.md, stripping leading blank lines.
+# Returns empty stdout if CHANGELOG.md is missing or has no matching section.
+# Uses index() rather than ~ matching because gawk strips `\[` escapes from
+# regex strings and interprets the result as a character class.
+extract_changelog_section() {
+  [ -f CHANGELOG.md ] || return 1
+  awk -v ver="$VERSION" '
+    BEGIN { skip_lead=1 }
+    index($0, "## [" ver "]") == 1 { in_section=1; next }
+    in_section && index($0, "## [") == 1 { exit }
+    in_section && skip_lead && $0 == "" { next }
+    in_section { skip_lead=0; print }
+  ' CHANGELOG.md
+}
+
 if gh release view "v${VERSION}" >/dev/null 2>&1; then
   info "GitHub release v${VERSION} already exists — skipping"
 else
-  PREV_TAG=$(git tag --sort=-v:refname | grep -A1 "^v${VERSION}$" | tail -1)
-  if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "v${VERSION}" ]; then
-    CHANGELOG=$(git log --oneline "${PREV_TAG}..v${VERSION}" --no-decorate | sed 's/^[a-f0-9]* /- /')
+  NOTES=$(extract_changelog_section || true)
+  if [ -n "$NOTES" ]; then
+    REPO_URL=$(gh repo view --json url -q .url 2>/dev/null || echo "")
+    if [ -n "$REPO_URL" ]; then
+      NOTES="${NOTES}
+
+**Full changelog:** ${REPO_URL}/blob/v${VERSION}/CHANGELOG.md"
+    fi
+    info "Using CHANGELOG.md [${VERSION}] section for release notes"
   else
-    CHANGELOG="Initial release"
+    warn "No CHANGELOG.md [${VERSION}] section found — falling back to git log"
+    PREV_TAG=$(git tag --sort=-v:refname | grep -A1 "^v${VERSION}$" | tail -1)
+    if [ -n "$PREV_TAG" ] && [ "$PREV_TAG" != "v${VERSION}" ]; then
+      NOTES=$(git log --oneline "${PREV_TAG}..v${VERSION}" --no-decorate | sed 's/^[a-f0-9]* /- /')
+    else
+      NOTES="Initial release"
+    fi
   fi
 
   gh release create "v${VERSION}" \
     --title "v${VERSION}" \
-    --notes "$CHANGELOG"
+    --notes "$NOTES"
   info "GitHub release created"
 fi
 
