@@ -94,16 +94,17 @@ describe("cleanupTempFiles", () => {
     expect(fs.existsSync(path.join(dir, "cache.tmp"))).toBe(false);
   });
 
-  it("cleans an existing default subdir when the other is missing", () => {
-    // Fresh profiles often have Network/ but no Session Storage/ yet.
-    const networkDir = path.join(tmpDir, "Network");
-    fs.mkdirSync(networkDir);
-    fs.writeFileSync(path.join(networkDir, "cache.tmp"), "");
+  it("continues past a missing default subdir and cleans the later one", () => {
+    // Network/ (scanned first) is missing; the file sits in Session Storage/
+    // (scanned second), so removal proves the loop survives the missing dir.
+    const sessionDir = path.join(tmpDir, "Session Storage");
+    fs.mkdirSync(sessionDir);
+    fs.writeFileSync(path.join(sessionDir, "LOG.old.tmp"), "");
 
     const removed = cleanupTempFiles(tmpDir);
 
     expect(removed).toBe(1);
-    expect(fs.existsSync(path.join(networkDir, "cache.tmp"))).toBe(false);
+    expect(fs.existsSync(path.join(sessionDir, "LOG.old.tmp"))).toBe(false);
   });
 
   it("matches case-insensitively when the option extension is uppercase", () => {
