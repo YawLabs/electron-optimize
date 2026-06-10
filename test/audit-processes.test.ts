@@ -127,6 +127,29 @@ describe("auditProcesses", () => {
     expect(result.totalMemoryFormatted).toBe("4.0 GB");
   });
 
+  it("treats a malformed workingSetSize as 0 instead of NaN", () => {
+    const app = mockApp([{ type: "Browser", pid: 100, cpu: 0, memoryKB: Number.NaN }]);
+    const result = auditProcesses(app);
+    expect(result.processes[0].memory).toBe(0);
+    expect(result.processes[0].memoryFormatted).toBe("0 B");
+    expect(result.totalMemory).toBe(0);
+    expect(result.totalMemoryFormatted).toBe("0 B");
+  });
+
+  it("promotes values just under the 1 MB boundary into the MB tier", () => {
+    // 1023.99 KB would otherwise display as "1024.0 KB"
+    const app = mockApp([{ type: "Browser", pid: 100, cpu: 0, memoryKB: 1023.99 }]);
+    const result = auditProcesses(app);
+    expect(result.processes[0].memoryFormatted).toBe("1.0 MB");
+  });
+
+  it("promotes values just under the 1 GB boundary into the GB tier", () => {
+    // ~1023.9999 MB would otherwise display as "1024.0 MB"
+    const app = mockApp([{ type: "Browser", pid: 100, cpu: 0, memoryKB: 1024 * 1024 - 0.1 }]);
+    const result = auditProcesses(app);
+    expect(result.processes[0].memoryFormatted).toBe("1.0 GB");
+  });
+
   it("handles empty metrics (no processes)", () => {
     const app = mockApp([]);
     const result = auditProcesses(app);

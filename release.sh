@@ -145,7 +145,9 @@ fi
 # =============================================================================
 step 4 "Publish to npm"
 
-PUBLISHED_VERSION=$(npm view @yawlabs/electron-optimize version 2>/dev/null || echo "")
+# Query the exact version, not the latest dist-tag — re-running a release for
+# an older version after a newer one exists must still detect "already published".
+PUBLISHED_VERSION=$(npm view "@yawlabs/electron-optimize@${VERSION}" version 2>/dev/null || echo "")
 
 if [ "$PUBLISHED_VERSION" = "$VERSION" ]; then
   info "v${VERSION} already published on npm — skipping"
@@ -173,6 +175,7 @@ extract_changelog_section() {
     BEGIN { skip_lead=1 }
     index($0, "## [" ver "]") == 1 { in_section=1; next }
     in_section && index($0, "## [") == 1 { exit }
+    in_section && $0 ~ /^\[[^]]+\]: / { exit }
     in_section && skip_lead && $0 == "" { next }
     in_section { skip_lead=0; print }
   ' CHANGELOG.md

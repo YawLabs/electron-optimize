@@ -10,7 +10,11 @@ export interface ProcessInfo {
   /** OS process ID */
   pid: number;
 
-  /** CPU usage percentage (0-100) over the measurement interval */
+  /**
+   * CPU usage percentage over the measurement interval. May exceed 100 on
+   * multi-core systems: macOS and Linux report ~100 per fully-utilized core
+   * (Windows normalizes to 0-100).
+   */
   cpu: number;
 
   /** Working set size in bytes (resident memory) */
@@ -44,10 +48,16 @@ export interface AuditResult {
 }
 
 function formatBytes(bytes: number): string {
+  if (!Number.isFinite(bytes)) return "0 B";
   if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`;
+  let value = bytes / 1024;
+  for (const unit of ["KB", "MB"]) {
+    // Pick the tier by the *displayed* value so e.g. 1048570 bytes renders
+    // as "1.0 MB", not "1024.0 KB" (toFixed rounds up at the boundary).
+    if (Number(value.toFixed(1)) < 1024) return `${value.toFixed(1)} ${unit}`;
+    value /= 1024;
+  }
+  return `${value.toFixed(1)} GB`;
 }
 
 /**
@@ -87,7 +97,9 @@ export function auditProcesses(app: ElectronApp): AuditResult {
   const metrics = app.getAppMetrics();
 
   const processes: ProcessInfo[] = metrics.map((m) => {
-    const mem = m.memory.workingSetSize * 1024; // getAppMetrics returns KB
+    // getAppMetrics returns KB; treat a malformed/missing workingSetSize as 0
+    // so memory and memoryFormatted never become NaN.
+    const mem = Number.isFinite(m.memory.workingSetSize) ? m.memory.workingSetSize * 1024 : 0;
     return {
       type: m.type,
       pid: m.pid,

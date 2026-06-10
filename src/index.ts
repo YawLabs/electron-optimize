@@ -5,6 +5,9 @@ export { cleanupTempFiles } from "./cleanup-temp-files";
 export type { ClearCacheOnUpdateOptions, ClearCacheOnUpdateResult } from "./clear-cache-on-update";
 export { clearCacheOnUpdate } from "./clear-cache-on-update";
 export type {
+  AppMetrics,
+  AppMetricsCpu,
+  AppMetricsMemory,
   ElectronApp,
   ElectronPowerMonitor,
   ElectronSession,

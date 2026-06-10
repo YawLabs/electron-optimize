@@ -46,7 +46,7 @@ app.whenReady().then(async () => {
     app.getVersion(),
     session.defaultSession,
   );
-  if (result.versionChanged) {
+  if (result.versionChanged && !result.isFirstRun) {
     console.log(`Updated ${result.previousVersion} -> ${result.currentVersion}`);
   }
 });
@@ -56,6 +56,8 @@ app.whenReady().then(async () => {
 - `clearCacheStorage` — clear Service Worker caches (default: `true`). Set to `false` for offline-first apps.
 - `clearHttpCache` — clear HTTP disk cache (default: `true`)
 - `versionFilename` — file used to track last-run version (default: `'.last-version'`)
+
+**Returns:** `versionChanged`, `previousVersion` (null on first run), `currentVersion`, `isFirstRun`, `cleared` (all attempted clears succeeded), and `recorded` (the version file now holds `currentVersion`; `false` means the next launch retries).
 
 ### validateWindowBounds
 
@@ -77,8 +79,10 @@ const win = new BrowserWindow({ ...bounds });
 **How it works:**
 1. Checks if saved position falls within the target display
 2. If on-screen: clamps to display edges (prevents partial off-screen)
-3. If off-screen: centers at 80% of display size
-4. Enforces minimum dimensions (400x300 default)
+3. If off-screen: centers at the default fraction of display size (80% unless configured)
+4. Enforces minimum dimensions (400x300 default), capped at the display size
+
+Each dimension is validated independently: a saved width or height larger than the display falls back to the default fraction for that dimension while the saved (clamped) position and the other dimension are kept.
 
 **Options:**
 - `defaultWidthFraction` / `defaultHeightFraction` — size for new/off-screen windows (default: `0.8`)

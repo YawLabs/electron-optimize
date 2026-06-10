@@ -27,12 +27,24 @@ export interface ClearCacheOnUpdateOptions {
 }
 
 export interface ClearCacheOnUpdateResult {
-  /** Whether the version changed since last run */
+  /** Whether the version changed since last run (also true on first run) */
   versionChanged: boolean;
   /** The version from the previous run, or null on first run */
   previousVersion: string | null;
-  /** The current version */
+  /** The current version (trimmed) */
   currentVersion: string;
+  /** True when no previous version was recorded (fresh install) */
+  isFirstRun: boolean;
+  /**
+   * True when every attempted cache clear succeeded (vacuously true when
+   * none ran — version unchanged or both clears disabled).
+   */
+  cleared: boolean;
+  /**
+   * True when the version file now records `currentVersion`. False means a
+   * clear or the version-file write failed, so the next launch will retry.
+   */
+  recorded: boolean;
 }
 
 /**
@@ -64,7 +76,7 @@ export interface ClearCacheOnUpdateResult {
  *     app.getVersion(),
  *     session.defaultSession,
  *   );
- *   if (result.versionChanged) {
+ *   if (result.versionChanged && !result.isFirstRun) {
  *     console.log(`Updated from ${result.previousVersion} to ${result.currentVersion}`);
  *   }
  * });
@@ -80,6 +92,9 @@ export async function clearCacheOnUpdate(
   const clearCacheStorage = options?.clearCacheStorage ?? true;
   const clearHttpCache = options?.clearHttpCache ?? true;
   const versionFile = path.join(userData, filename);
+  // Normalize: the file is read back with .trim(), so write/compare the same
+  // form — otherwise a padded version string would re-clear on every launch.
+  const version = currentVersion.trim();
 
   let previousVersion: string | null = null;
   try {
@@ -88,7 +103,10 @@ export async function clearCacheOnUpdate(
     // First run — no version file yet
   }
 
-  const versionChanged = previousVersion !== currentVersion;
+  const versionChanged = previousVersion !== version;
+  const isFirstRun = previousVersion === null;
+  let cleared = true;
+  let recorded = !versionChanged;
 
   if (versionChanged) {
     const attempts: Promise<boolean>[] = [];
@@ -114,16 +132,17 @@ export async function clearCacheOnUpdate(
     const results = await Promise.all(attempts);
     // Only record the new version if every attempted clear succeeded; otherwise
     // leave the old version on disk so the next launch retries the clears.
-    const allSucceeded = results.every(Boolean);
+    cleared = results.every(Boolean);
 
-    if (allSucceeded) {
+    if (cleared) {
       try {
-        fs.writeFileSync(versionFile, currentVersion);
+        fs.writeFileSync(versionFile, version);
+        recorded = true;
       } catch {
-        // Best effort — non-critical
+        // Best effort — the next launch will re-clear and retry the write
       }
     }
   }
 
-  return { versionChanged, previousVersion, currentVersion };
+  return { versionChanged, previousVersion, currentVersion: version, isFirstRun, cleared, recorded };
 }

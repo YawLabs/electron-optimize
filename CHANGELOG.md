@@ -7,6 +7,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `validateWindowBounds`: saved-on-screen bounds are now capped at the
+  display size when `minWidth` / `minHeight` exceed the display. Previously
+  only the centered (no/off-screen saved bounds) path applied the cap, so a
+  display smaller than the minimums could yield a window larger than the
+  display. The JSDoc had promised this cap all along.
+- `auditProcesses`: a malformed `workingSetSize` from `getAppMetrics()` is
+  treated as 0 instead of producing `NaN` memory values and `"NaN GB"`
+  formatted strings.
+- `auditProcesses`: formatted values just under a unit boundary no longer
+  render as `1024.0 KB` / `1024.0 MB`; the tier is chosen by the displayed
+  (rounded) value, so they promote to `1.0 MB` / `1.0 GB`.
+- `clearCacheOnUpdate`: `currentVersion` is trimmed before comparing and
+  writing, matching the trimmed read-back. A whitespace-padded version
+  string previously re-cleared caches on every launch.
+- `release.sh`: changelog extraction now stops at the link-reference block,
+  so releasing the last (or only) section in CHANGELOG.md no longer bleeds
+  `[x.y.z]: https://...` lines into the GitHub release notes.
+- `release.sh`: the already-published check queries the exact version
+  (`npm view pkg@version`) instead of the `latest` dist-tag, so re-running
+  an interrupted release for an older version skips publish correctly.
+
+### Changed
+
+- `clearCacheOnUpdate` result now includes `isFirstRun` (distinguish fresh
+  install from upgrade), `cleared` (all attempted clears succeeded), and
+  `recorded` (the version file now holds `currentVersion`). The documented
+  example guards its "Updated from X to Y" log with `!result.isFirstRun`.
+- `auditProcesses`: `ProcessInfo.cpu` documentation no longer claims a
+  0-100 range; Electron reports ~100 per fully-utilized core on
+  macOS/Linux.
+- `electron` peer dependency is now optional (`peerDependenciesMeta`).
+  The library only ever receives Electron objects as arguments, and npm 7+
+  auto-installed the ~100 MB Electron binary for consumers who did not
+  already have it.
+- Published packages now include `src/` so the shipped sourcemaps and
+  declaration maps resolve.
+- `index.ts` re-exports the `AppMetrics`, `AppMetricsCpu`, and
+  `AppMetricsMemory` types.
+- Release pipeline (`release.yml`) now runs lint and typecheck before
+  publishing, matching the PR CI gates.
+- `CONTRIBUTING.md` pre-commit checklist now includes `npm run typecheck`
+  (a CI gate that `build` + `test` alone do not cover), and the
+  supported-versions policy no longer claims active testing against real
+  Electron binaries.
+- `biome.json` `files.includes` narrowed to `src/**` and `test/**` to match
+  what the lint scripts actually check.
+
 ## [1.2.0] - 2026-05-16
 
 ### Changed

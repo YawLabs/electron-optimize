@@ -129,4 +129,24 @@ describe("validateWindowBounds", () => {
     expect(bounds.width).toBeLessThanOrEqual(300);
     expect(bounds.height).toBeLessThanOrEqual(200);
   });
+
+  it("caps saved-on-screen bounds at the display size when minimums exceed the display", () => {
+    const tinyDisplay = { x: 0, y: 0, width: 300, height: 200 };
+    // Saved bounds fit the display, but the default minWidth (400) and
+    // minHeight (300) do not — the cap must win over the minimum.
+    const saved = { x: 10, y: 10, width: 250, height: 150 };
+    const bounds = validateWindowBounds(saved, tinyDisplay);
+    expect(bounds.width).toBe(300);
+    expect(bounds.height).toBe(200);
+    expect(bounds.x).toBe(0);
+    expect(bounds.y).toBe(0);
+  });
+
+  it("caps saved-on-screen bounds with custom minimums larger than the display", () => {
+    const display = { x: 0, y: 0, width: 640, height: 480 };
+    const saved = { x: 0, y: 0, width: 600, height: 400 };
+    const bounds = validateWindowBounds(saved, display, { minWidth: 800, minHeight: 600 });
+    expect(bounds.width).toBe(640);
+    expect(bounds.height).toBe(480);
+  });
 });

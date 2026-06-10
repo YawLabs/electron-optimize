@@ -17,6 +17,7 @@ git checkout -b your-branch-name
 
 # 4. Make your changes, then verify everything passes
 npm run lint:fix
+npm run typecheck
 npm run build
 npm test
 ```
@@ -39,6 +40,7 @@ npm test
 | `npm test` | Run the test suite |
 | `npm run lint` | Check for lint errors |
 | `npm run lint:fix` | Auto-fix lint and formatting |
+| `npm run typecheck` | Type-check src and tests (CI gate; `build` skips tests and vitest does not type-check) |
 
 ## Code Style
 
@@ -52,7 +54,7 @@ npm test
 If you're an AI agent (Claude Code, Copilot, Cursor, etc.) submitting a PR:
 
 1. **Fork the repo** and work on a branch — direct pushes to the default branch are blocked.
-2. **Always run `npm run lint:fix && npm run build && npm test`** before committing. Do not skip this.
+2. **Always run `npm run lint:fix && npm run typecheck && npm run build && npm test`** before committing. Do not skip this.
 3. **Do not add unrelated changes** — no drive-by refactors, no extra comments, no unrelated formatting fixes.
 4. **PR description must explain the change clearly** — what problem does it solve, how does it work, how was it tested.
 5. **One logical change per PR.** If you're fixing a bug and adding a feature, that's two PRs.
@@ -70,7 +72,7 @@ Open an issue on GitHub. Include:
 This is an Electron utility library, so we anchor our supported versions to Electron's support matrix rather than Node's LTS calendar. The rule:
 
 - **`engines.node`** ≥ minimum Node version bundled by any Electron major currently in Electron's stable support window.
-- **`peerDependencies.electron`** ≥ oldest Electron major we actively test against.
+- **`peerDependencies.electron`** ≥ oldest Electron major whose API surface this package targets. (The unit tests mock Electron's APIs; we don't run against real Electron binaries.)
 - **CI matrix** tests those Node versions, no older.
 
 When Electron drops an old major from their support matrix, we drop its Node version from ours. When a Node version hits EOL and no supported Electron still bundles it, we drop it.

@@ -52,6 +52,10 @@ export interface ValidateWindowBoundsOptions {
  *    smaller than `minWidth`/`minHeight` will yield a window sized to the
  *    display rather than overflowing it)
  *
+ * Each dimension is validated independently: a saved width/height larger
+ * than the display falls back to the default fraction for that dimension
+ * while the saved (clamped) position and the other dimension are kept.
+ *
  * Use with Electron's `screen.getDisplayNearestPoint()` to find the
  * right display for saved or cursor coordinates.
  *
@@ -103,13 +107,13 @@ export function validateWindowBounds(
   let height: number;
 
   if (savedOnScreen && savedBounds!.width <= dw) {
-    width = Math.max(savedBounds!.width, minW);
+    width = Math.min(Math.max(savedBounds!.width, minW), dw);
   } else {
     width = Math.min(Math.max(Math.round(dw * defaultWidthFrac), minW), dw);
   }
 
   if (savedOnScreen && savedBounds!.height <= dh) {
-    height = Math.max(savedBounds!.height, minH);
+    height = Math.min(Math.max(savedBounds!.height, minH), dh);
   } else {
     height = Math.min(Math.max(Math.round(dh * defaultHeightFrac), minH), dh);
   }
