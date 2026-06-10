@@ -117,6 +117,20 @@ describe("cleanupTempFiles", () => {
     expect(removed).toBe(2);
   });
 
+  it("treats a dot-less extension option as a raw suffix", () => {
+    const dir = path.join(tmpDir, "Network");
+    fs.mkdirSync(dir);
+    fs.writeFileSync(path.join(dir, "back.tmp"), "");
+    fs.writeFileSync(path.join(dir, "backtmp"), "");
+    fs.writeFileSync(path.join(dir, "keep.dat"), "");
+
+    const removed = cleanupTempFiles(tmpDir, { extensions: ["tmp"] });
+
+    // "tmp" without a dot matches any name ending in "tmp" -- both files go.
+    expect(removed).toBe(2);
+    expect(fs.existsSync(path.join(dir, "keep.dat"))).toBe(true);
+  });
+
   it("accepts custom subdirs and extensions", () => {
     const customDir = path.join(tmpDir, "CustomCache");
     fs.mkdirSync(customDir);

@@ -86,6 +86,16 @@ describe("clearCacheOnUpdate", () => {
     expect(session.calls).toContain("clearCache");
   });
 
+  it("matches a version file with a trailing newline (hand-edited or echo-written)", async () => {
+    fs.writeFileSync(path.join(tmpDir, ".last-version"), "1.0.0\n");
+    const session = mockSession();
+    const result = await clearCacheOnUpdate(tmpDir, "1.0.0", session);
+
+    expect(result.versionChanged).toBe(false);
+    expect(result.previousVersion).toBe("1.0.0");
+    expect(session.calls).toHaveLength(0);
+  });
+
   it("normalizes a whitespace-padded currentVersion so it does not re-clear every launch", async () => {
     const session = mockSession();
     const first = await clearCacheOnUpdate(tmpDir, " 1.2.3 ", session);

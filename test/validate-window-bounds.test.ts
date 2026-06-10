@@ -130,6 +130,28 @@ describe("validateWindowBounds", () => {
     expect(bounds.height).toBeLessThanOrEqual(200);
   });
 
+  it("treats a window at exactly the display's right edge as off-screen", () => {
+    // x = 1920 on a 0..1920 display: a window snapped to a secondary monitor
+    // whose origin coincides with the primary's right edge. The on-screen
+    // predicate is strictly less-than, so this must take the centered path.
+    const saved = { x: 1920, y: 100, width: 800, height: 600 };
+    const bounds = validateWindowBounds(saved, DISPLAY);
+    expect(bounds).toEqual({ x: 192, y: 108, width: 1536, height: 864 });
+  });
+
+  it("treats a window one pixel inside the display edge as on-screen", () => {
+    const saved = { x: 1919, y: 100, width: 800, height: 600 };
+    const bounds = validateWindowBounds(saved, DISPLAY);
+    // Size kept, x clamped left so the window fits the display
+    expect(bounds).toEqual({ x: 1920 - 800, y: 100, width: 800, height: 600 });
+  });
+
+  it("treats a window at exactly the display's bottom edge as off-screen", () => {
+    const saved = { x: 100, y: 1080, width: 800, height: 600 };
+    const bounds = validateWindowBounds(saved, DISPLAY);
+    expect(bounds).toEqual({ x: 192, y: 108, width: 1536, height: 864 });
+  });
+
   it("keeps saved dimensions exactly equal to the display size (maximized window)", () => {
     const saved = { x: 100, y: 50, width: 1920, height: 1080 };
     const bounds = validateWindowBounds(saved, DISPLAY);
