@@ -81,6 +81,41 @@ describe("cleanupTempFiles", () => {
     spy.mockRestore();
   });
 
+  it("skips a directory whose name matches a target extension without crashing", () => {
+    const dir = path.join(tmpDir, "Network");
+    fs.mkdirSync(dir);
+    fs.mkdirSync(path.join(dir, "scratch.tmp")); // unlinkSync throws on directories
+    fs.writeFileSync(path.join(dir, "cache.tmp"), "");
+
+    const removed = cleanupTempFiles(tmpDir);
+
+    expect(removed).toBe(1);
+    expect(fs.existsSync(path.join(dir, "scratch.tmp"))).toBe(true);
+    expect(fs.existsSync(path.join(dir, "cache.tmp"))).toBe(false);
+  });
+
+  it("cleans an existing default subdir when the other is missing", () => {
+    // Fresh profiles often have Network/ but no Session Storage/ yet.
+    const networkDir = path.join(tmpDir, "Network");
+    fs.mkdirSync(networkDir);
+    fs.writeFileSync(path.join(networkDir, "cache.tmp"), "");
+
+    const removed = cleanupTempFiles(tmpDir);
+
+    expect(removed).toBe(1);
+    expect(fs.existsSync(path.join(networkDir, "cache.tmp"))).toBe(false);
+  });
+
+  it("matches case-insensitively when the option extension is uppercase", () => {
+    const dir = path.join(tmpDir, "Network");
+    fs.mkdirSync(dir);
+    fs.writeFileSync(path.join(dir, "a.tmp"), "");
+    fs.writeFileSync(path.join(dir, "b.TMP"), "");
+
+    const removed = cleanupTempFiles(tmpDir, { extensions: [".TMP"] });
+    expect(removed).toBe(2);
+  });
+
   it("accepts custom subdirs and extensions", () => {
     const customDir = path.join(tmpDir, "CustomCache");
     fs.mkdirSync(customDir);

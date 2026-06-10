@@ -130,6 +130,21 @@ describe("validateWindowBounds", () => {
     expect(bounds.height).toBeLessThanOrEqual(200);
   });
 
+  it("keeps saved dimensions exactly equal to the display size (maximized window)", () => {
+    const saved = { x: 100, y: 50, width: 1920, height: 1080 };
+    const bounds = validateWindowBounds(saved, DISPLAY);
+    // Equality passes the <= guard: size kept, position clamped to the origin
+    expect(bounds).toEqual({ x: 0, y: 0, width: 1920, height: 1080 });
+  });
+
+  it("caps a default fraction greater than 1 at the display size", () => {
+    const bounds = validateWindowBounds(null, DISPLAY, {
+      defaultWidthFraction: 1.5,
+      defaultHeightFraction: 1.5,
+    });
+    expect(bounds).toEqual({ x: 0, y: 0, width: 1920, height: 1080 });
+  });
+
   it("caps saved-on-screen bounds at the display size when minimums exceed the display", () => {
     const tinyDisplay = { x: 0, y: 0, width: 300, height: 200 };
     // Saved bounds fit the display, but the default minWidth (400) and

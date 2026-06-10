@@ -70,6 +70,37 @@ describe("createStartupTimer", () => {
     hrtimeSpy.mockRestore();
   });
 
+  it("measures marks recorded after flush from timer creation, not from the flush", () => {
+    let counter = 0n;
+    const hrtimeSpy = vi.spyOn(process.hrtime, "bigint").mockImplementation(() => {
+      const v = counter;
+      counter += 1_500_000n; // +1.5 ms per call
+      return v;
+    });
+    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const timer = createStartupTimer(); // t0 = 0
+    timer.mark("before flush"); // 1.5 ms
+    timer.flush(); // resets marks, must NOT reset t0
+    timer.mark("after flush"); // 3.0 ms
+
+    expect(timer.getMarks()).toEqual([{ label: "after flush", ms: 3 }]);
+
+    consoleSpy.mockRestore();
+    hrtimeSpy.mockRestore();
+  });
+
+  it("getMarks is non-destructive and can be called repeatedly", () => {
+    const timer = createStartupTimer();
+    timer.mark("a");
+    timer.mark("b");
+
+    const first = timer.getMarks();
+    const second = timer.getMarks();
+    expect(first).toHaveLength(2);
+    expect(second).toEqual(first);
+  });
+
   it("reset clears marks without printing", () => {
     const spy = vi.spyOn(console, "log").mockImplementation(() => {});
     const timer = createStartupTimer();

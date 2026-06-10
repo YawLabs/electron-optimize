@@ -73,6 +73,19 @@ describe("clearCacheOnUpdate", () => {
     expect(session.calls).toContain("clearCache");
   });
 
+  it('treats an empty version file as an upgrade from "", not a first run', async () => {
+    // A crash between writeFileSync's truncate and write leaves a zero-byte
+    // file. Pins the current behavior: empty string is a previous version.
+    fs.writeFileSync(path.join(tmpDir, ".last-version"), "");
+    const session = mockSession();
+    const result = await clearCacheOnUpdate(tmpDir, "1.0.0", session);
+
+    expect(result.previousVersion).toBe("");
+    expect(result.isFirstRun).toBe(false);
+    expect(result.versionChanged).toBe(true);
+    expect(session.calls).toContain("clearCache");
+  });
+
   it("normalizes a whitespace-padded currentVersion so it does not re-clear every launch", async () => {
     const session = mockSession();
     const first = await clearCacheOnUpdate(tmpDir, " 1.2.3 ", session);
