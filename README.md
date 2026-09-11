@@ -1,5 +1,7 @@
 # electron-optimize
 
+[![Follow @TokenLimitNews on X](https://img.shields.io/badge/follow-%40TokenLimitNews-000000?logo=x&logoColor=white)](https://x.com/TokenLimitNews)
+
 Drop-in optimization utilities for Electron apps. Each function is independent — import what you need, skip what you don't.
 
 Built by [Yaw Labs](https://yaw.sh), extracted from a shipping Electron app after a user ran a full performance audit and we systematically verified every finding.
