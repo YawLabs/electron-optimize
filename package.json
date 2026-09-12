@@ -19,8 +19,8 @@
     "build": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "biome check src/ test/",
-    "lint:fix": "biome check --write src/ test/",
+    "lint": "node scripts/lint.mjs check src/ test/",
+    "lint:fix": "node scripts/lint.mjs check --write src/ test/",
     "typecheck": "tsc --noEmit -p tsconfig.test.json",
     "prepublishOnly": "npm run build"
   },
