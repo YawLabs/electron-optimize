@@ -203,9 +203,17 @@ else
     fi
   fi
 
+  # --notes-file, not --notes: the body is a whole CHANGELOG section, and
+  # passing that as a command-line ARGUMENT exceeds the ~32kB CreateProcess
+  # limit on Windows -- `gh: Argument list too long`, exit 126. That killed
+  # step 6 of tailscale-mcp's v0.21.0 release AFTER npm had published, and
+  # mcp-compliance hit it at 62kB. A file has no such limit anywhere.
+  NOTES_FILE=$(mktemp)
+  printf '%s\n' "$NOTES" > "$NOTES_FILE"
   gh release create "v${VERSION}" \
     --title "v${VERSION}" \
-    --notes "$NOTES"
+    --notes-file "$NOTES_FILE"
+  rm -f "$NOTES_FILE"
   info "GitHub release created"
 fi
 
