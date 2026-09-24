@@ -204,4 +204,4 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md#supported-node--electron-versions) for t
 
 MIT
 
-[![Follow @TokenLimitNews on X](https://img.shields.io/badge/follow-%40TokenLimitNews-000000?logo=x&logoColor=white)](https://x.com/TokenLimitNews)
+[![Follow @YawLabs on X](https://img.shields.io/badge/follow-%40YawLabs-000000?logo=x&logoColor=white)](https://x.com/YawLabs)
