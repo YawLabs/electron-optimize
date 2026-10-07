@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
 
+# Default every job to read-only; the release job below grants itself the
+# write scopes it needs (GitHub release creation, npm provenance).
+permissions:
+  contents: read
+
 jobs:
   release:
     runs-on: ubuntu-latest

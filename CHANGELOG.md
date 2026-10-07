@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- CI workflow: the `GITHUB_TOKEN` is now limited to `contents: read` via a
+  top-level `permissions` block instead of inheriting the repository default
+  (CodeQL `actions/missing-workflow-permissions`). The release workflow also
+  defaults to read-only at the top level; its release job keeps its explicit
+  `contents: write` / `id-token: write` grant.
+
 ## [1.3.0] - 2026-06-10
 
 ### Fixed
