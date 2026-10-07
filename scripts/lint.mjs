@@ -33,12 +33,10 @@
  * install below passes `--force` for that reason and `--no-save` so the
  * workaround never leaks into package.json.
  *
- * Why it matters here specifically: this repo HAS workflows that lint --
- * .github/workflows/ci.yml runs `npm run lint` on every push and pull request,
- * and release.yml runs it on a v* tag -- but GitHub Actions is DISABLED on the
- * repository, so neither one ever runs and nothing arbitrates formatting after
- * the fact. release.sh does not lint at all. Whatever this script reports is
- * the ONLY lint signal that exists before a release is published.
+ * Why it matters here specifically: CI for this repo is local -- there are no
+ * GitHub Actions workflows, so nothing arbitrates formatting after the fact.
+ * release.sh does not lint at all. Whatever this script reports is the ONLY
+ * lint signal that exists before a release is published.
  *
  * Escape hatches, in case the platform assumption ages badly:
  *   YAWLABS_BIOME_BIN=<path>   use exactly this binary, skip all detection
@@ -56,12 +54,9 @@ const exe = isWindows ? ".exe" : "";
 
 /**
  * Every spawn below is bounded, because `npm run lint` is written to run
- * UNATTENDED -- ci.yml invokes it on every push and pull request, and
- * release.yml invokes it on a v* tag before handing off to release.sh. An
- * unbounded child there turns a WEDGED job rather than a failed one, with no
- * output to say why. Both workflows are dormant while Actions is disabled on
- * this repo, so today the unattended caller is whatever script or agent runs
- * the lint script directly -- which has the same failure mode and no job log.
+ * UNATTENDED -- by whatever local script or agent runs it as this repo's CI.
+ * An unbounded child there is a WEDGED run rather than a failed one, with no
+ * output to say why.
  *
  * Deliberately generous -- these convert an infinite hang into a reported
  * failure, they are not performance budgets. For scale, biome checks this repo
