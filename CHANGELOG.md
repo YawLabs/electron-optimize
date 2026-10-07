@@ -11,12 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- The dormant GitHub Actions workflows (`.github/workflows/ci.yml` and
-  `release.yml`). CI for this repo is local -- lint, typecheck and tests run on
-  the workstation, and `release.sh` publishes -- and Actions was never enabled,
-  so neither workflow ever ran. Removing them also retires the
-  `actions/missing-workflow-permissions` class of findings outright instead of
-  hardening files nothing executes. The package itself is unchanged.
+- The GitHub Actions workflows (`.github/workflows/ci.yml` and `release.yml`).
+  CI for this repo is local -- lint, typecheck and tests run on the
+  workstation, and `release.sh` publishes. Actions is disabled, so these
+  workflows no longer run (the last run was on 2026-07-18). Removing them also
+  retires the `actions/missing-workflow-permissions` class of findings outright
+  instead of hardening files nothing executes. The package itself is unchanged.
 
 ## [1.3.1] - 2026-10-07
 
