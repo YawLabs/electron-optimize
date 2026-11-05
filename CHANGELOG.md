@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-11-05
+
+### Changed
+- Bump the dev-dependencies group with 2 updates (#29)
+- Bump the dev-dependencies group across 1 directory with 2 updates (#28)
+- docs(changelog): correct the Actions history in the workflow-removal entry (#26)
+- build(release): fleet-style local release script
+
 ## [1.3.2] - 2026-10-07
 
 ### Removed
@@ -164,7 +172,8 @@ No functional changes. Tooling and metadata only.
 - `auditProcesses` — per-process CPU and memory breakdown for Electron's
   child processes.
 
-[Unreleased]: https://github.com/YawLabs/electron-optimize/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/YawLabs/electron-optimize/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/YawLabs/electron-optimize/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/YawLabs/electron-optimize/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/YawLabs/electron-optimize/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/YawLabs/electron-optimize/releases/tag/v1.3.0
