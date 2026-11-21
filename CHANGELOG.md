@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.4] - 2026-11-21
+
+### Changed
+- chore(biome): migrate config schema to 2.6.8 and adopt preset key
+- Bump the dev-dependencies group with 2 updates (#32)
+- test: cover resume re-arm, cleanup idempotency, and option fallbacks
+- Bump @biomejs/biome from 2.6.5 to 2.6.6 in the dev-dependencies group (#31)
+- Bump the dev-dependencies group with 3 updates (#30)
+
 ## [1.3.3] - 2026-11-05
 
 ### Changed
@@ -172,7 +181,8 @@ No functional changes. Tooling and metadata only.
 - `auditProcesses` — per-process CPU and memory breakdown for Electron's
   child processes.
 
-[Unreleased]: https://github.com/YawLabs/electron-optimize/compare/v1.3.3...HEAD
+[Unreleased]: https://github.com/YawLabs/electron-optimize/compare/v1.3.4...HEAD
+[1.3.4]: https://github.com/YawLabs/electron-optimize/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/YawLabs/electron-optimize/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/YawLabs/electron-optimize/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/YawLabs/electron-optimize/compare/v1.3.0...v1.3.1
