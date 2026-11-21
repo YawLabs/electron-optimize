@@ -146,4 +146,23 @@ describe("cleanupTempFiles", () => {
     expect(fs.existsSync(path.join(customDir, "old.bak"))).toBe(false);
     expect(fs.existsSync(path.join(customDir, "old.log"))).toBe(true);
   });
+
+  it("falls back to .tmp extensions when only subdirs is overridden", () => {
+    const customDir = path.join(tmpDir, "CustomCache");
+    const networkDir = path.join(tmpDir, "Network");
+    fs.mkdirSync(customDir);
+    fs.mkdirSync(networkDir);
+
+    fs.writeFileSync(path.join(customDir, "stale.tmp"), "");
+    fs.writeFileSync(path.join(customDir, "keep.dat"), "");
+    // subdirs overrides the defaults, so Network/ must not be scanned.
+    fs.writeFileSync(path.join(networkDir, "cache.tmp"), "");
+
+    const removed = cleanupTempFiles(tmpDir, { subdirs: ["CustomCache"] });
+
+    expect(removed).toBe(1);
+    expect(fs.existsSync(path.join(customDir, "stale.tmp"))).toBe(false);
+    expect(fs.existsSync(path.join(customDir, "keep.dat"))).toBe(true);
+    expect(fs.existsSync(path.join(networkDir, "cache.tmp"))).toBe(true);
+  });
 });

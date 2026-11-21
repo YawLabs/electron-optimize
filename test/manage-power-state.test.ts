@@ -136,4 +136,56 @@ describe("managePowerState", () => {
 
     expect(onResume).not.toHaveBeenCalled();
   });
+
+  it("re-arms the resume timeout after a full sleep/wake cycle", () => {
+    const pm = mockPowerMonitor();
+    const onSuspend = vi.fn();
+    const onResume = vi.fn();
+
+    managePowerState(pm, { onSuspend, onResume });
+
+    // First wake: delay elapses and onResume fires.
+    pm.emit("resume");
+    vi.advanceTimersByTime(5000);
+    expect(onResume).toHaveBeenCalledTimes(1);
+
+    // Second full cycle: suspend cancels nothing (timeout already fired),
+    // then resume must schedule a NEW timeout.
+    pm.emit("suspend");
+    expect(onSuspend).toHaveBeenCalledTimes(1);
+    pm.emit("resume");
+    expect(onResume).toHaveBeenCalledTimes(1); // not yet -- delay pending
+    vi.advanceTimersByTime(5000);
+
+    expect(onResume).toHaveBeenCalledTimes(2);
+    expect(onSuspend).toHaveBeenCalledTimes(1);
+  });
+
+  it("cleanup is idempotent when called multiple times", () => {
+    const pm = mockPowerMonitor();
+    const onSuspend = vi.fn();
+    const onResume = vi.fn();
+    const cleanup = managePowerState(pm, { onSuspend, onResume });
+
+    // Emit events first so cleanup runs against a live listener set.
+    pm.emit("suspend");
+    pm.emit("resume");
+    expect(pm.listenerCount("suspend")).toBe(1);
+    expect(pm.listenerCount("resume")).toBe(1);
+
+    expect(() => cleanup()).not.toThrow();
+    expect(pm.listenerCount("suspend")).toBe(0);
+    expect(pm.listenerCount("resume")).toBe(0);
+
+    expect(() => cleanup()).not.toThrow();
+    expect(pm.listenerCount("suspend")).toBe(0);
+    expect(pm.listenerCount("resume")).toBe(0);
+
+    // Events after cleanup are ignored, and the cancelled timeout stays dead.
+    pm.emit("suspend");
+    pm.emit("resume");
+    vi.advanceTimersByTime(10000);
+    expect(onSuspend).toHaveBeenCalledTimes(1);
+    expect(onResume).not.toHaveBeenCalled();
+  });
 });

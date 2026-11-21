@@ -186,4 +186,19 @@ describe("validateWindowBounds", () => {
     expect(bounds.width).toBe(640);
     expect(bounds.height).toBe(480);
   });
+
+  it("minimum wins over a small default fraction on the off-screen fallback", () => {
+    // Off-screen saved bounds force the fallback branch, but the caller asks
+    // for a fraction (0.1) far below what the default minimums allow:
+    // 1920*0.1 = 192 < minWidth 400, 1080*0.1 = 108 < minHeight 300.
+    const saved = { x: 3000, y: 500, width: 800, height: 600 };
+    const bounds = validateWindowBounds(saved, DISPLAY, {
+      defaultWidthFraction: 0.1,
+      defaultHeightFraction: 0.1,
+    });
+    expect(bounds.width).toBe(400); // minWidth wins over the fraction
+    expect(bounds.height).toBe(300); // minHeight wins over the fraction
+    expect(bounds.x).toBe(760); // (1920 - 400) / 2
+    expect(bounds.y).toBe(390); // (1080 - 300) / 2
+  });
 });

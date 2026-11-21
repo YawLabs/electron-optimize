@@ -70,6 +70,38 @@ describe("createStartupTimer", () => {
     hrtimeSpy.mockRestore();
   });
 
+  it("flush prints one padded line per mark after the header", () => {
+    // Pin hrtime with a deterministic increment so every ms value is exact.
+    let counter = 0n;
+    const hrtimeSpy = vi.spyOn(process.hrtime, "bigint").mockImplementation(() => {
+      const v = counter;
+      counter += 2_500_000n; // +2.5 ms per call
+      return v;
+    });
+    const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+    const timer = createStartupTimer(); // t0 = 0
+    timer.mark("alpha"); // 2.5 ms
+    timer.mark("beta"); // 5.0 ms
+    timer.mark("gamma"); // 7.5 ms
+    timer.flush();
+
+    // Derive the expected payload from the implementation's format:
+    //   header `[label]`, then per mark:
+    //   "  " + ms.toFixed(1).padStart(8) + "ms  " + name
+    const line = (ms: number, name: string) => `  ${ms.toFixed(1).padStart(8)}ms  ${name}`;
+    const expected = `[startup]\n` + [line(2.5, "alpha"), line(5.0, "beta"), line(7.5, "gamma")].join("\n");
+
+    expect(consoleSpy).toHaveBeenCalledOnce();
+    expect(consoleSpy.mock.calls[0][0]).toBe(expected);
+
+    // flush resets the marks so a later flush prints nothing new
+    expect(timer.getMarks()).toHaveLength(0);
+
+    consoleSpy.mockRestore();
+    hrtimeSpy.mockRestore();
+  });
+
   it("measures marks recorded after flush from timer creation, not from the flush", () => {
     let counter = 0n;
     const hrtimeSpy = vi.spyOn(process.hrtime, "bigint").mockImplementation(() => {

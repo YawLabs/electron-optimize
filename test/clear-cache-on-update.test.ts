@@ -189,6 +189,29 @@ describe("clearCacheOnUpdate", () => {
     expect(written).toBe("2.0.0");
   });
 
+  it("treats a version-file read failure as a first run", async () => {
+    // Pre-create the file, then make reading it fail (e.g. an AV scanner
+    // holding a lock). Pins the catch at src/clear-cache-on-update.ts:102-104,
+    // which maps any read error to "no previous version".
+    fs.writeFileSync(path.join(tmpDir, ".last-version"), "1.0.0");
+    const originalReadFileSync = fs.readFileSync;
+    const spy = vi.spyOn(fs, "readFileSync").mockImplementation(((file: any, ...args: any[]) => {
+      if (String(file).endsWith(".last-version")) {
+        throw Object.assign(new Error("EACCES: permission denied"), { code: "EACCES" });
+      }
+      return originalReadFileSync(file, ...args);
+    }) as typeof fs.readFileSync);
+
+    const session = mockSession();
+    const result = await clearCacheOnUpdate(tmpDir, "2.0.0", session);
+    spy.mockRestore();
+
+    expect(result.previousVersion).toBeNull();
+    expect(result.isFirstRun).toBe(true);
+    expect(result.versionChanged).toBe(true);
+    expect(session.calls.length).toBeGreaterThan(0);
+  });
+
   it("uses custom version filename", async () => {
     const session = mockSession();
     await clearCacheOnUpdate(tmpDir, "1.0.0", session, {
